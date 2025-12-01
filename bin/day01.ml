@@ -30,12 +30,13 @@ let wrap n =
 
 let step (pos, tally) instruction =
   let new_pos = 
-    match instruction with
-    | TurnLeft steps -> pos - (steps mod 100)
-    | TurnRight steps -> pos + (steps mod 100)
+    (match instruction with
+      | TurnLeft steps -> pos - (wrap steps)
+      | TurnRight steps -> pos + (wrap steps)
+    )
     |> wrap in
   let new_tally = if new_pos = 0 then tally + 1 else tally in
-  (wrap new_pos, new_tally)
+  (new_pos, new_tally)
 
 let solve input =
   let lines = split_lines input in
