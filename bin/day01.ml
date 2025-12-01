@@ -44,7 +44,30 @@ let solve input =
   let (_final_pos, tally) = List.fold_left step (50, 0) instructions in
   tally
 
+(* stage 2 *)
+
+  let rec step' (pos, tally) instruction =
+    match instruction with
+    | TurnLeft 0 | TurnRight 0 -> (pos, tally)
+    | TurnLeft steps ->
+        let new_pos = wrap (pos - 1) in
+        let new_tally = if new_pos = 0 then tally + 1 else tally in
+        step' (new_pos, new_tally) (TurnLeft (steps - 1))
+    | TurnRight steps ->
+        let new_pos = wrap (pos + 1) in
+        let new_tally = if new_pos = 0 then tally + 1 else tally in
+        step' (new_pos, new_tally) (TurnRight (steps - 1))
+
+let solve' input =
+  let lines = split_lines input in
+  let instructions = List.map parse_turn lines in
+  let (_final_pos, tally) = List.fold_left step' (50, 0) instructions in
+  tally
+
+
 let () =
   let input = read_input 1 in
-  Printf.printf "Example: %d\n" (solve example_input);
-  Printf.printf "Part 1: %d\n" (solve input)
+  Printf.printf "Example 1: %d\n" (solve example_input);
+  Printf.printf "Part 1: %d\n" (solve input);
+  Printf.printf "Example 2: %d\n" (solve' example_input);
+  Printf.printf "Part 2: %d\n" (solve' input);
