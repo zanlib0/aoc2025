@@ -1,0 +1,50 @@
+open Aoc2025.Utils
+
+let example_input = "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"
+
+let (>>) f g x = g(f x)
+
+let parse_ranges input =
+  String.split_on_char ',' (String.trim input)
+  |> List.map (fun range_str ->
+    match String.split_on_char '-' range_str with
+      | [start; finish] -> (int_of_string start, int_of_string finish)
+      | _ -> failwith "Invalid range format")
+
+
+let lazy_range (start, finish) =
+  Seq.unfold (fun n ->
+    if n > finish then None
+    else Some (n, n+1)
+  ) start
+
+let remove_odds =
+  Seq.filter (fun num ->
+    num
+    |> string_of_int
+    |> String.length
+    |> (fun len -> len mod 2)
+    |> (=) 0
+  )
+
+let filter_doubles =
+  Seq.filter (fun num ->
+    let str = string_of_int num in
+    let len = String.length str in
+    let front_half = String.sub str 0 (len / 2) in
+    let back_half = String.sub str (len / 2) (len / 2) in
+    front_half = back_half
+  )
+    
+let solve input =
+  let ranges = parse_ranges input in
+  let seqs = List.map lazy_range ranges in
+  List.map (remove_odds >> filter_doubles >> List.of_seq) seqs
+  |> List.flatten
+  |> List.fold_left (+) 0
+
+
+let () =
+  let input = read_input 2 in
+  Printf.printf "Example 1: %d\n" (solve example_input);
+  Printf.printf "Part 1: %d\n" (solve input);
