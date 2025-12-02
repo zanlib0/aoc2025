@@ -43,8 +43,44 @@ let solve input =
   |> List.flatten
   |> List.fold_left (+) 0
 
+(* stage 2 *)
+
+let get_substrings num =
+  let str = string_of_int num in
+  let limit = (String.length str) / 2 in
+  lazy_range (1, limit)
+  |> Seq.map(fun n -> String.sub str 0 n)
+  |> List.of_seq
+
+let drop n str =
+  let len = String.length str in
+  let n' = min n len in
+  String.sub str n' (len - n')
+
+let rec consists_of_substring str substr =
+  let substr_len = String.length substr in
+
+  if str = substr then true
+  else if (substr_len > String.length str) then false
+  else if (String.sub str 0 substr_len) <> substr then false
+  else consists_of_substring (drop substr_len str) substr
+
+let check_number num =
+  get_substrings num
+  |> List.exists (fun substr -> consists_of_substring (string_of_int num) substr)
+
+let filter_seq = Seq.filter check_number
+
+let solve' input =
+  let ranges = parse_ranges input in
+  let seqs = List.map lazy_range ranges in
+  List.map (filter_seq >> List.of_seq) seqs
+  |> List.flatten
+  |> List.fold_left (+) 0
 
 let () =
   let input = read_input 2 in
   Printf.printf "Example 1: %d\n" (solve example_input);
   Printf.printf "Part 1: %d\n" (solve input);
+  Printf.printf "Example 2: %d\n" (solve' example_input);
+  Printf.printf "Part 2: %d\n" (solve' input);
