@@ -35,12 +35,16 @@ let filter_doubles =
     let back_half = String.sub str (len / 2) (len / 2) in
     front_half = back_half
   )
-    
-let solve input =
+
+let prep input =
   let ranges = parse_ranges input in
   let seqs = List.map lazy_range ranges in
-  List.map (remove_odds >> filter_doubles >> List.of_seq) seqs
-  |> List.flatten
+  seqs
+
+    
+let solve input =
+  prep input
+  |> List.concat_map (remove_odds >> filter_doubles >> List.of_seq)
   |> List.fold_left (+) 0
 
 (* stage 2 *)
@@ -72,10 +76,8 @@ let check_number num =
 let filter_seq = Seq.filter check_number
 
 let solve' input =
-  let ranges = parse_ranges input in
-  let seqs = List.map lazy_range ranges in
-  List.map (filter_seq >> List.of_seq) seqs
-  |> List.flatten
+  prep input
+  |> List.concat_map (filter_seq >> List.of_seq)
   |> List.fold_left (+) 0
 
 let () =
