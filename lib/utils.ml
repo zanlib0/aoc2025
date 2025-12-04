@@ -12,3 +12,9 @@ let (>>) f g x = g(f x)
 let print_list lst =
   List.iter (fun x -> Printf.printf "%d " x) lst;
   print_newline ()
+
+let get_safe array row col =
+  if row >= 0 && row < Array.length array &&
+    col >= 0 && col < Array.length array.(row)
+  then Some array.(row).(col)
+  else None
