@@ -18,6 +18,11 @@ let field_of_char = function
   | '@' -> Paper
   | _ -> failwith "unknown field"
 
+let sum_2d_array (arr: int array array) =
+  arr
+  |> Array.map (Array.fold_left (+) 0)
+  |> Array.fold_left (+) 0
+
 let prep input =
   input
   |> split_lines
@@ -41,20 +46,47 @@ let check_neighbouring_fields fields row col =
   |> List.map (fun (row, col) -> check_field_empty fields row col)
   |> is_accessible
 
-let accessible_fields fields =
-  Array.mapi (fun row row_value -> Array.mapi (fun col _ -> 
+let get_accessible_fields fields =
+  mapi_2d_array (fun row col _cell ->
     match check_field_empty fields row col with
     | Empty -> 0
     | Paper -> check_neighbouring_fields fields row col
-  ) row_value) fields
+  ) fields
 
 let solve input =
   let fields = prep input in
-  accessible_fields fields
-  |> Array.map (Array.fold_left (+) 0)
-  |> Array.fold_left (+) 0
+  get_accessible_fields fields
+  |> sum_2d_array
+
+(* stage 2 *)
+
+let remove_accessible_step fields accessible_fields =
+  mapi_2d_array (fun row col cell ->
+    match accessible_fields.(row).(col) with
+    | 0 -> cell
+    | 1 -> Empty
+    | _ -> failwith "wrong accessible_fields value"
+  ) fields
+
+let rec remove_accessible fields =
+  let accessible_fields = get_accessible_fields fields in
+  let next_fields = remove_accessible_step fields accessible_fields in
+  if next_fields = fields then next_fields else remove_accessible next_fields
+
+let paper_difference fields final_fields =
+  fields |> mapi_2d_array (fun row col cell ->
+    if final_fields.(row).(col) = cell then 0 else 1
+  )
+
+let solve' input =
+  let fields = prep input in
+  let final_fields = remove_accessible fields in
+  paper_difference fields final_fields
+  |> sum_2d_array
 
 let () =
   let input = read_input 4 in
   Printf.printf "Example 1: %d\n" (solve example_input);
   Printf.printf "Part 1: %d\n" (solve input);
+  Printf.printf "Example 2: %d\n" (solve' example_input);
+  Printf.printf "Part 2: %d\n" (solve' input);

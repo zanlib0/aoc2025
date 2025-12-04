@@ -18,3 +18,10 @@ let get_safe array row col =
     col >= 0 && col < Array.length array.(row)
   then Some array.(row).(col)
   else None
+
+let mapi_2d_array f arr =
+  arr |> Array.mapi(fun row row' ->
+    row' |> Array.mapi(fun col cell ->
+      f row col cell
+    )
+  )
