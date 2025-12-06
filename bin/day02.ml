@@ -9,13 +9,6 @@ let parse_ranges input =
       | [start; finish] -> (int_of_string start, int_of_string finish)
       | _ -> failwith "Invalid range format")
 
-
-let lazy_range (start, finish) =
-  Seq.unfold (fun n ->
-    if n > finish then None
-    else Some (n, n+1)
-  ) start
-
 let remove_odds =
   Seq.filter (fun num ->
     num

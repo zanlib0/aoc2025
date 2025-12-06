@@ -25,3 +25,10 @@ let mapi_2d_array f arr =
       f row col cell
     )
   )
+
+let lazy_range (start, finish) =
+  Seq.unfold (fun n ->
+    if n > finish then None
+    else Some (n, n+1)
+  ) start
+
