@@ -27,3 +27,8 @@
   (public_name day05)
   (name day05)
   (libraries aoc2025))
+
+(executable
+  (public_name day06)
+  (name day06)
+  (libraries aoc2025))
