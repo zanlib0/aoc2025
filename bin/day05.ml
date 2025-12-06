@@ -42,15 +42,27 @@ let solve input =
 
 (* stage 2 *)
 
-module IntSet = Set.Make(Int)
+let disjoint (a, b) (c, d) = c > b || a > d
+let merge (a, b) (c, d) = ((min a c), (max b d))
+let is_empty (a, b) = a > b
+let count (a, b) = b - a + 1
 
-let add_range_to_set (set: IntSet.t) range =
-  Seq.fold_left (Fun.flip IntSet.add) set (lazy_range range)
+let clean ranges =
+  ranges
+  |> List.sort compare
+  |> List.fold_left (fun acc r ->
+    match acc with
+    | [] -> [r]
+    | current :: tail -> if (disjoint r current) then r :: current :: tail else (merge r current) :: tail
+  ) []
+  |> List.filter (Fun.negate is_empty)
+  |> List.rev
 
 let solve' input =
   let (ranges, _) = prep input in
-  List.fold_left add_range_to_set IntSet.empty ranges
-  |> IntSet.cardinal
+  clean ranges
+  |> List.map count
+  |> List.fold_left (+) 0
 
 let () =
   let input = read_input 5 in
