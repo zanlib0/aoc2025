@@ -40,7 +40,21 @@ let solve input =
   List.filter (fun ingredient -> List.exists (in_range ingredient) ranges) ingredients
   |> List.length
 
+(* stage 2 *)
+
+module IntSet = Set.Make(Int)
+
+let add_range_to_set (set: IntSet.t) range =
+  Seq.fold_left (Fun.flip IntSet.add) set (lazy_range range)
+
+let solve' input =
+  let (ranges, _) = prep input in
+  List.fold_left add_range_to_set IntSet.empty ranges
+  |> IntSet.cardinal
+
 let () =
   let input = read_input 5 in
   Printf.printf "Example 1: %d\n" (solve example_input);
   Printf.printf "Part 1: %d\n" (solve input);
+  Printf.printf "Example 2: %d\n" (solve' example_input);
+  Printf.printf "Part 2: %d\n" (solve' input);
